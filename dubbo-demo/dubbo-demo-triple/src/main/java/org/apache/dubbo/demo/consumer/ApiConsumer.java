@@ -21,8 +21,8 @@ import org.apache.dubbo.config.ApplicationConfig;
 import org.apache.dubbo.config.ReferenceConfig;
 import org.apache.dubbo.config.RegistryConfig;
 import org.apache.dubbo.demo.GreeterService;
-import org.apache.dubbo.demo.hello.HelloReply;
-import org.apache.dubbo.demo.hello.HelloRequest;
+//import org.apache.dubbo.demo.hello.HelloReply;
+//import org.apache.dubbo.demo.hello.HelloRequest;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -40,11 +40,11 @@ public class ApiConsumer {
         GreeterService greeterService = referenceConfig.get();
         System.out.println("dubbo referenceConfig started");
         try {
-            final HelloReply reply = greeterService.sayHello(HelloRequest.newBuilder()
-                    .setName("triple")
-                    .build());
+//            final HelloReply reply = greeterService.sayHello(HelloRequest.newBuilder()
+//                    .setName("triple")
+//                    .build());
             TimeUnit.SECONDS.sleep(1);
-            System.out.println("Reply: " + reply.getMessage());
+//            System.out.println("Reply: " + reply.getMessage());
         } catch (Throwable t) {
             t.printStackTrace();
         }

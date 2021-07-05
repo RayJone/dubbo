@@ -619,8 +619,10 @@ public class ExtensionLoader<T> {
         }
     }
 
+    //获取自适应扩展代理类
     @SuppressWarnings("unchecked")
     public T getAdaptiveExtension() {
+        //获取自适应对象，没有，则双重校验锁 创建
         Object instance = cachedAdaptiveInstance.get();
         if (instance == null) {
             if (createAdaptiveInstanceError != null) {
@@ -633,6 +635,7 @@ public class ExtensionLoader<T> {
                 instance = cachedAdaptiveInstance.get();
                 if (instance == null) {
                     try {
+                        //创建自适应扩展对象
                         instance = createAdaptiveExtension();
                         cachedAdaptiveInstance.set(instance);
                     } catch (Throwable t) {
@@ -717,6 +720,7 @@ public class ExtensionLoader<T> {
         return getExtensionClasses().containsKey(name);
     }
 
+    //通过setter注入手动扩展依赖，可以认为是简单的IOC实现，
     private T injectExtension(T instance) {
 
         if (objectFactory == null) {
@@ -799,12 +803,16 @@ public class ExtensionLoader<T> {
     }
 
     private Map<String, Class<?>> getExtensionClasses() {
+        //1、缓存中获取
+        //2、双重校验锁  加载
         Map<String, Class<?>> classes = cachedClasses.get();
         if (classes == null) {
             synchronized (cachedClasses) {
                 classes = cachedClasses.get();
                 if (classes == null) {
+                    //加载
                     classes = loadExtensionClasses();
+                    //设置到缓存
                     cachedClasses.set(classes);
                 }
             }
@@ -832,6 +840,7 @@ public class ExtensionLoader<T> {
      * extract and cache default extension name if exists
      */
     private void cacheDefaultExtensionName() {
+        //获取type @SPI注解上的值
         final SPI defaultAnnotation = type.getAnnotation(SPI.class);
         if (defaultAnnotation == null) {
             return;
@@ -844,6 +853,7 @@ public class ExtensionLoader<T> {
                 throw new IllegalStateException("More than 1 default extension name on extension " + type.getName()
                         + ": " + Arrays.toString(names));
             }
+            //name设置到缓存中
             if (names.length == 1) {
                 cachedDefaultName = names[0];
             }
@@ -1068,6 +1078,12 @@ public class ExtensionLoader<T> {
     @SuppressWarnings("unchecked")
     private T createAdaptiveExtension() {
         try {
+            /*
+               *
+               * 1、调用 getAdaptiveExtensionClass 方法获取自适应拓展 Class 对象
+                 2、通过反射进行实例化
+                 3、调用 injectExtension 方法向拓展实例中注入依赖
+             */
             return injectExtension((T) getAdaptiveExtensionClass().newInstance());
         } catch (Exception e) {
             throw new IllegalStateException("Can't create adaptive extension " + type + ", cause: " + e.getMessage(), e);
@@ -1075,6 +1091,9 @@ public class ExtensionLoader<T> {
     }
 
     private Class<?> getAdaptiveExtensionClass() {
+        //1、调用getExtensionClasses  获取所有扩展class
+        //2、判断缓存是否为空，不为空直接返回
+        //3、缓存为空，调用createAdaptiveExtensionClass 并设置缓存
         getExtensionClasses();
         if (cachedAdaptiveClass != null) {
             return cachedAdaptiveClass;
