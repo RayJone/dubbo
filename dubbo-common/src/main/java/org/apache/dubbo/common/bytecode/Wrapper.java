@@ -146,6 +146,7 @@ public abstract class Wrapper {
         for (Field f : c.getFields()) {
             String fn = f.getName();
             Class<?> ft = f.getType();
+            //忽略static 和 transient修改的
             if (Modifier.isStatic(f.getModifiers()) || Modifier.isTransient(f.getModifiers())) {
                 continue;
             }

@@ -93,10 +93,13 @@ public class AdaptiveClassCodeGenerator {
         }
 
         StringBuilder code = new StringBuilder();
+        //生成包
         code.append(generatePackageInfo());
+        //生成Import  import xxx;
         code.append(generateImports());
+        //生成类声明public class xxx {}
         code.append(generateClassDeclaration());
-
+        //生成方法声明
         Method[] methods = type.getMethods();
         for (Method method : methods) {
             code.append(generateMethod(method));
@@ -158,6 +161,7 @@ public class AdaptiveClassCodeGenerator {
     private String generateMethod(Method method) {
         String methodReturnType = method.getReturnType().getCanonicalName();
         String methodName = method.getName();
+        //生成方法体
         String methodContent = generateMethodContent(method);
         String methodArgs = generateMethodArguments(method);
         String methodThrows = generateMethodThrows(method);
@@ -201,8 +205,10 @@ public class AdaptiveClassCodeGenerator {
         Adaptive adaptiveAnnotation = method.getAnnotation(Adaptive.class);
         StringBuilder code = new StringBuilder(512);
         if (adaptiveAnnotation == null) {
+            //没有@Adaptive 注解 仅生成异常
             return generateUnsupported(method);
         } else {
+            //获取  URL.class   参数在 入参中的下标
             int urlTypeIndex = getUrlTypeIndex(method);
 
             // found parameter in URL type
@@ -329,6 +335,7 @@ public class AdaptiveClassCodeGenerator {
     private String[] getMethodAdaptiveValue(Adaptive adaptiveAnnotation) {
         String[] value = adaptiveAnnotation.value();
         // value is not set, use the value generated from class name as the key
+        //value为空，用类名生成
         if (value.length == 0) {
             String splitName = StringUtils.camelToSplitName(type.getSimpleName(), ".");
             value = new String[]{splitName};
